@@ -45,6 +45,9 @@ class OrderTracker
 
   std::optional<OrderState> get(OrderId id) const;
 
+  /// Find local order id by exchange resting / fill order id (e.g. Hyperliquid `oid`).
+  std::optional<OrderId> findLocalIdByExchangeOrderId(std::string_view exchangeOrderId) const;
+
   bool exists(OrderId id) const;
 
   bool isActive(OrderId id) const;

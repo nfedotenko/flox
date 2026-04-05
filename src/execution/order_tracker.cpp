@@ -184,6 +184,17 @@ std::optional<OrderState> OrderTracker::get(OrderId id) const
   return it->second;
 }
 
+std::optional<OrderId> OrderTracker::findLocalIdByExchangeOrderId(std::string_view exchangeOrderId) const
+{
+  std::lock_guard<std::mutex> lock(_mutex);
+  for (const auto& [id, state] : _orders)
+  {
+    if (state.exchangeOrderId == exchangeOrderId)
+      return id;
+  }
+  return std::nullopt;
+}
+
 bool OrderTracker::exists(OrderId id) const
 {
   std::lock_guard<std::mutex> lock(_mutex);
