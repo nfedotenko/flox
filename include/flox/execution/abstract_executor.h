@@ -13,6 +13,8 @@
 #include "flox/execution/exchange_capabilities.h"
 #include "flox/execution/order.h"
 
+#include <vector>
+
 namespace flox
 {
 
@@ -31,6 +33,18 @@ class IOrderExecutor : public ISubsystem
   virtual void cancelOrder(OrderId orderId) {}
   virtual void cancelAllOrders(SymbolId symbol) {}
   virtual void replaceOrder(OrderId oldOrderId, const Order& newOrder) {}
+
+  // Batch submit. Default impl loops `submitOrder`; venue executors
+  // override this to coalesce into a single batch endpoint (e.g. OKX
+  // `/api/v5/trade/batch-orders`) which halves API request count for
+  // market-making strategies that emit bid+ask pairs each cycle.
+  virtual void submitOrders(const std::vector<Order>& orders)
+  {
+    for (const auto& o : orders)
+    {
+      submitOrder(o);
+    }
+  }
 
   // OCO: one-cancels-other
   virtual void submitOCO(const OCOParams& params) {}
